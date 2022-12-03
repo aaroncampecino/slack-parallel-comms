@@ -1,4 +1,10 @@
 import { User } from "../database/model/User";
+export const getUserInfo = async (client, userId, token) => {
+  return await client.users.info({
+    user: userId,
+    token: token,
+  });
+};
 export const getNonBotUsers = async (client, teamId, token) => {
   const wsUsersTemp = await client.users.list({
     team_id: teamId,

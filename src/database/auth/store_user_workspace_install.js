@@ -39,10 +39,10 @@ const saveUserWorkspaceInstall = async (installation) => {
           expiresAt: installation.bot.expiresAt,
         },
         incomingWebhook: {
-          url: installation.incomingWebhook.url,
-          channel: installation.incomingWebhook.channel,
-          channelId: installation.incomingWebhook.channelId,
-          configurationUrl: installation.incomingWebhook.configurationUrl,
+          url: installation.incomingWebhook?.url,
+          channel: installation.incomingWebhook?.channel,
+          channelId: installation.incomingWebhook?.channelId,
+          configurationUrl: installation.incomingWebhook?.configurationUrl,
         },
       },
       { upsert: true }
