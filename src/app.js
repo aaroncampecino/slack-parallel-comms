@@ -44,6 +44,7 @@ const app = new App({
   },
   installationStore: {
     storeInstallation: async (installation) => {
+      console.log("installation " + JSON.stringify(installation));
       if (
         installation.isEnterpriseInstall &&
         installation.enterprise !== undefined
