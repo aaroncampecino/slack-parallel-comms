@@ -1,0 +1,42 @@
+{
+  "display_information": {
+    "name": "SDJ Services",
+    "description": "SDJ Services",
+    "background_color": "#b512b5"
+  },
+  "features": {
+    "app_home": {
+      "home_tab_enabled": true,
+      "messages_tab_enabled": false,
+      "messages_tab_read_only_enabled": true
+    },
+    "bot_user": {
+      "display_name": "SDJ Services",
+      "always_online": true
+    }
+  },
+  "oauth_config": {
+    "scopes": {
+      "bot": [
+        "team:read",
+        "users:read",
+        "users:read.email",
+        "channels:manage",
+        "channels:read",
+        "groups:write"
+      ]
+    }
+  },
+  "settings": {
+    "event_subscriptions": {
+      "bot_events": ["app_home_opened", "channel_created", "channel_deleted"]
+    },
+    "interactivity": {
+      "is_enabled": true,
+      "request_url": "https://2651-2001-4455-19b-1f00-e103-8478-8fcb-67.ngrok.io/slack/events"
+    },
+    "org_deploy_enabled": false,
+    "socket_mode_enabled": true,
+    "token_rotation_enabled": false
+  }
+}

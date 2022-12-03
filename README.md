@@ -1,0 +1,15 @@
+### Create .env on root directory and add code
+
+```node
+SLACK_BOT_SIGNING_SECRET=
+SLACK_CLIENT_ID=
+SLACK_CLIENT_SECRET=
+
+LOG_LEVEL=info
+
+PORT=8085
+
+DB_USERNAME=
+DB_PASSWORD=
+DB_NAME=
+```

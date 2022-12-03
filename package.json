@@ -1,0 +1,27 @@
+{
+  "name": "slack-sdj-services",
+  "version": "1.0.0",
+  "description": "slack-sdj-services",
+  "main": "src",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "engines": {
+    "node": "16.14.0"
+  },
+  "dependencies": {
+    "@slack/bolt": "^3.11.0",
+    "dotenv": "^16.0.1",
+    "esm": "^3.2.25",
+    "mongoose": "^6.7.1",
+    "node-schedule": "^2.1.0",
+    "slack-block-builder": "^2.5.0",
+    "uuid": "^9.0.0",
+    "winston": "^3.8.2",
+    "winston-daily-rotate-file": "^4.7.1"
+  }
+}
