@@ -63,10 +63,12 @@ const app = new App({
         installQuery.isEnterpriseInstall &&
         installQuery.enterpriseId !== undefined
       ) {
-        return await user.findUser(installQuery.enterpriseId);
+        const data = await user.findUser(installQuery.enterpriseId);
+        return data._doc;
       }
       if (installQuery.teamId !== undefined) {
-        return await user.findUser(installQuery.teamId);
+        const data = await user.findUser(installQuery.teamId);
+        return data._doc;
       }
       throw new Error("Failed fetching installation");
     },
@@ -87,6 +89,7 @@ const app = new App({
 
 registerListeners(app);
 
+// app.client.chat.postMessage({});
 (async () => {
   // Start the app
   await app.start(process.env.PORT);

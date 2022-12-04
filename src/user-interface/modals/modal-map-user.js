@@ -1,31 +1,25 @@
 const { Modal, Blocks, Elements, Option } = require("slack-block-builder");
 
-module.exports = (supplierId, adminUsers, supplierUsers, data) => {
-  let adminuserIdOption;
+module.exports = (supplierId, adminUsers, data) => {
   let adminmapUserIdOption;
-  let supplieruserIdOption;
   let suppliermapUserIdOption;
+  let adminDisplayname;
+  let supplierDisplayname;
 
   if (data !== undefined) {
-    adminuserIdOption = Option({
-      text: `${data?.admin.userName}`,
-      value: `${data?.admin.userId}`,
-    });
-
     adminmapUserIdOption = Option({
       text: `${data?.admin.mapUserName}`,
       value: `${data?.admin.mapUserId}`,
     });
 
-    supplieruserIdOption = Option({
-      text: `${data?.suppliers.userName}`,
-      value: `${data?.suppliers.userId}`,
-    });
+    adminDisplayname = data?.admin.mapDisplayName;
 
     suppliermapUserIdOption = Option({
       text: `${data?.suppliers.mapUserName}`,
       value: `${data?.suppliers.mapUserId}`,
     });
+
+    supplierDisplayname = data?.suppliers.mapDisplayName;
   }
 
   return Modal({
@@ -36,22 +30,7 @@ module.exports = (supplierId, adminUsers, supplierUsers, data) => {
   })
     .blocks(
       Blocks.Input({
-        label: "Admin User on Admin Workspace",
-        blockId: "adminuserId",
-      }).element(
-        Elements.StaticSelect({
-          actionId: "adminuserId",
-          placeholder: "Select user",
-        })
-          .options(
-            adminUsers.map((item) =>
-              Option({ text: `${item.real_name}`, value: `${item.id}` })
-            )
-          )
-          .initialOption(adminuserIdOption)
-      ),
-      Blocks.Input({
-        label: "Admin User on Supplier Workspace",
+        label: "User to display on Supplier Workspace",
         blockId: "adminmapUserId",
       }).element(
         Elements.StaticSelect({
@@ -59,29 +38,26 @@ module.exports = (supplierId, adminUsers, supplierUsers, data) => {
           placeholder: "Select user",
         })
           .options(
-            supplierUsers.map((item) =>
+            adminUsers.map((item) =>
               Option({ text: `${item.real_name}`, value: `${item.id}` })
             )
           )
           .initialOption(adminmapUserIdOption)
       ),
+
       Blocks.Input({
-        label: "Supplier User on Supplier Workspace",
-        blockId: "supplieruserId",
+        label: "Display name",
+        blockId: "admindisplayNameId",
       }).element(
-        Elements.StaticSelect({
-          actionId: "supplieruserId",
-          placeholder: "Select user",
+        Elements.TextInput({
+          actionId: "admindisplayNameId",
+          placeholder: "",
+          initialValue: adminDisplayname,
         })
-          .options(
-            supplierUsers.map((item) =>
-              Option({ text: `${item.real_name}`, value: `${item.id}` })
-            )
-          )
-          .initialOption(supplieruserIdOption)
       ),
+
       Blocks.Input({
-        label: "Supplier User on Admin Workspace",
+        label: "User to display on Admin Workspace",
         blockId: "suppliermapUserId",
       }).element(
         Elements.StaticSelect({
@@ -94,6 +70,16 @@ module.exports = (supplierId, adminUsers, supplierUsers, data) => {
             )
           )
           .initialOption(suppliermapUserIdOption)
+      ),
+      Blocks.Input({
+        label: "Display name",
+        blockId: "supplierdisplayNameId",
+      }).element(
+        Elements.TextInput({
+          actionId: "supplierdisplayNameId",
+          placeholder: "",
+          initialValue: supplierDisplayname,
+        })
       )
     )
     .buildToJSON();

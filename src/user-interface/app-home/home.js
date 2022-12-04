@@ -22,10 +22,10 @@ module.exports = (workspaces, userMap) => {
         .primary(true),
       Button({ text: "Create Channel" })
         .value("app-home-create-channel")
-        .actionId("app-home-create-channel"),
-      Button({ text: "Notify Workspace" })
-        .value("app-home-notify-workspace")
-        .actionId("app-home-notify-workspace")
+        .actionId("app-home-create-channel")
+      // Button({ text: "Notify Workspace" })
+      //   .value("app-home-notify-workspace")
+      //   .actionId("app-home-notify-workspace")
     )
   );
 
@@ -41,35 +41,28 @@ module.exports = (workspaces, userMap) => {
   const allWorkspaces = [];
 
   workspaces.map((element) => {
-    let actions = Actions({ blockId: `actionId${element._id}` }).elements(
-      Button({
-        text: "Map User",
-        actionId: "app-home-map-user",
-        value: `${element._id}`,
-      })
-    );
-
     const mapIndex = userMap.findIndex((user, index) => {
       if (user.suppliers.teamId == element._id) return true;
     });
 
     const map = userMap.splice(mapIndex, 1)[0];
-    let adminUserName = map?.admin?.userName;
-    if (adminUserName === undefined) adminUserName = "None";
-    let adminMapUsername = map?.admin?.mapUserName;
+    let adminMapUsername = map?.admin?.mapDisplayName;
     if (adminMapUsername === undefined) adminMapUsername = "None";
 
-    let supplierUserName = map?.suppliers?.mapUserName;
-    if (supplierUserName === undefined) supplierUserName = "None";
-    let supplierMapUsername = map?.suppliers?.userName;
+    let supplierMapUsername = map?.suppliers?.mapDisplayName;
     if (supplierMapUsername === undefined) supplierMapUsername = "None";
 
     allWorkspaces.push(
       Divider(),
       Section({
-        text: `*Workspace name:* ${element.team.name}\n*Admin user*\nAdmin name: ${adminUserName}\tSupplier name: ${adminMapUsername}\n*Suplier user*\nAdmin name: ${supplierUserName}\tSupplier name: ${supplierMapUsername}`,
-      }),
-      actions
+        text: `*Workspace name:* ${element.team.name}\n*Admin name*: ${supplierMapUsername}\t*Supplier name*: ${adminMapUsername}`,
+      }).accessory(
+        Button({
+          text: "Map User",
+          actionId: "app-home-map-user",
+          value: `${element._id}`,
+        }).primary(true)
+      )
     );
   });
 

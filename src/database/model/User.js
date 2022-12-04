@@ -43,8 +43,8 @@ const User = mongoose.model("User", usersSchema);
 const findUser = async (id) => {
   try {
     const user = await User.findById(id);
-    if (user[0] !== undefined) {
-      return user[0];
+    if (user !== undefined) {
+      return user;
     }
   } catch (error) {
     console.error(error);

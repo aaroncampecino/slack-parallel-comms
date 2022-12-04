@@ -16,27 +16,40 @@
     }
   },
   "oauth_config": {
+    "redirect_urls": [
+      "https://54de-2001-4455-19b-1f00-ac3f-d6c0-d98a-7826.ngrok.io/slack/oauth_redirect"
+    ],
     "scopes": {
+      "user": ["channels:read", "channels:write", "chat:write", "users:write"],
       "bot": [
-        "team:read",
-        "users:read",
-        "users:read.email",
+        "channels:history",
         "channels:manage",
         "channels:read",
-        "groups:write"
+        "chat:write",
+        "chat:write.customize",
+        "groups:write",
+        "team:read",
+        "users:read",
+        "users:read.email"
       ]
     }
   },
   "settings": {
     "event_subscriptions": {
-      "bot_events": ["app_home_opened", "channel_created", "channel_deleted"]
+      "request_url": "https://54de-2001-4455-19b-1f00-ac3f-d6c0-d98a-7826.ngrok.io/slack/events",
+      "bot_events": [
+        "app_home_opened",
+        "channel_created",
+        "channel_deleted",
+        "message.channels"
+      ]
     },
     "interactivity": {
       "is_enabled": true,
-      "request_url": "https://2651-2001-4455-19b-1f00-e103-8478-8fcb-67.ngrok.io/slack/events"
+      "request_url": "https://54de-2001-4455-19b-1f00-ac3f-d6c0-d98a-7826.ngrok.io/slack/events"
     },
     "org_deploy_enabled": false,
-    "socket_mode_enabled": true,
-    "token_rotation_enabled": false
+    "socket_mode_enabled": false,
+    "token_rotation_enabled": true
   }
 }

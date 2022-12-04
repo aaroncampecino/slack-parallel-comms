@@ -19,13 +19,13 @@ const mapUserCallback = async ({ body, ack, client, action, context }) => {
     adminWorkspace._id,
     adminToken
   );
-  const supplierUsers = await getNonBotUsers(client, teamId, supplierToken);
+  // const supplierUsers = await getNonBotUsers(client, teamId, supplierToken);
 
   const userMap = await UserMap.find({ "suppliers.teamId": teamId });
 
   await client.views.open({
     trigger_id: body.trigger_id,
-    view: modals.modalMapUser(teamId, adminUsers, supplierUsers, userMap[0]),
+    view: modals.modalMapUser(teamId, adminUsers, userMap[0]),
     token: adminToken,
   });
 };

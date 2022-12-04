@@ -14,10 +14,10 @@ const hiCallback = async ({
   // console.log(JSON.stringify(context));
 
   console.log("body " + body);
-  console.log(JSON.stringify(body));
+  console.log(body);
 
   console.log("message " + message);
-  console.log(JSON.stringify(message));
+  console.log(message);
 
   const channelId = message.channel;
   const teamId = body.team_id;
@@ -37,10 +37,10 @@ const hiCallback = async ({
   //if message is coming from supplier workspaces, send message to admin workspace only
 
   let channels = [];
-  if (isAdmin) channels = channel.suppliers;
+  if (isAdmin) channels.push(channel.suppliers);
   else channels.push(channel.admin);
 
-  await postMessage(client, channels, messageText);
+  await postMessage(client, channels, messageText, teamId, message);
 };
 
 module.exports = { hiCallback };
