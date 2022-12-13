@@ -1,43 +1,41 @@
 import { User } from "../../database/model/User";
 import { Channel } from "../../database/model/Channel";
 import { createChannel } from "../../utility/slack_api";
+import { modals } from "../../user-interface";
 
 const createChannelCallback = async ({ ack, view, body, client }) => {
   await ack();
 
   const providedValues = view.state.values;
 
-  const workspace = providedValues.workspace.workspace.selected_option.value;
   const channelName = providedValues.channelNameId.channelNameId.value;
 
-  console.log("workspace " + workspace);
-  console.log("channelName " + channelName);
-
-  const user = await User.findById(workspace);
+  const users = await User.find({ isAdmin: false });
   const adminUser = await User.find({ isAdmin: true });
-  const users = [];
-  users.push(user);
-  users.push(adminUser[0]);
 
-  const adminTeamId = adminUser[0]._id;
+  try {
+    await createChannel(client, channelName, users, adminUser[0]).then(
+      (channels) => {
+        for (const channel of channels) {
+          Channel.create(channel);
+        }
+      }
+    );
+  } catch (error) {
+    const errorMsg = error.data.error;
+    let message = errorMsg;
+    if (errorMsg === "name_taken") message = "Channel is already taken.";
 
-  await createChannel(client, channelName, users).then((channels) => {
-    //get the admin channel and remove from channels array
-    const adminIndex = channels.findIndex((post, index) => {
-      if (post.teamId == adminTeamId) return true;
+    await client.views.open({
+      trigger_id: body.trigger_id,
+      view: modals.modalInfo(
+        "SDJ Services",
+        "temp_callback",
+        message,
+        ":warning:"
+      ),
     });
-
-    const adminChannel = channels.splice(adminIndex, 1)[0];
-
-    Channel.create({
-      admin: {
-        teamId: adminChannel.teamId,
-        channelId: adminChannel.channelId,
-        channelName: adminChannel.channelName,
-      },
-      suppliers: channels[0],
-    });
-  });
+  }
 };
 
 module.exports = { createChannelCallback };

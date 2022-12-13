@@ -1,7 +1,7 @@
 {
   "display_information": {
-    "name": "SDJ Services",
-    "description": "SDJ Services",
+    "name": "Parallel",
+    "description": "Parallel communication between Workspaces",
     "background_color": "#b512b5"
   },
   "features": {
@@ -11,22 +11,32 @@
       "messages_tab_read_only_enabled": true
     },
     "bot_user": {
-      "display_name": "SDJ Services",
+      "display_name": "Parallel",
       "always_online": true
     }
   },
   "oauth_config": {
     "redirect_urls": [
-      "https://54de-2001-4455-19b-1f00-ac3f-d6c0-d98a-7826.ngrok.io/slack/oauth_redirect"
+      "https://c33f-2001-4455-19b-1f00-d9a3-dc02-7398-d6ce.ngrok.io/slack/oauth_redirect"
     ],
     "scopes": {
-      "user": ["channels:read", "channels:write", "chat:write", "users:write"],
+      "user": [
+        "channels:read",
+        "channels:write",
+        "chat:write",
+        "files:read",
+        "files:write",
+        "users:write",
+        "channels:history"
+      ],
       "bot": [
         "channels:history",
         "channels:manage",
         "channels:read",
         "chat:write",
         "chat:write.customize",
+        "files:read",
+        "files:write",
         "groups:write",
         "team:read",
         "users:read",
@@ -36,7 +46,7 @@
   },
   "settings": {
     "event_subscriptions": {
-      "request_url": "https://54de-2001-4455-19b-1f00-ac3f-d6c0-d98a-7826.ngrok.io/slack/events",
+      "request_url": "https://c33f-2001-4455-19b-1f00-d9a3-dc02-7398-d6ce.ngrok.io/slack/events",
       "bot_events": [
         "app_home_opened",
         "channel_created",
@@ -46,7 +56,7 @@
     },
     "interactivity": {
       "is_enabled": true,
-      "request_url": "https://54de-2001-4455-19b-1f00-ac3f-d6c0-d98a-7826.ngrok.io/slack/events"
+      "request_url": "https://c33f-2001-4455-19b-1f00-d9a3-dc02-7398-d6ce.ngrok.io/slack/events"
     },
     "org_deploy_enabled": false,
     "socket_mode_enabled": false,

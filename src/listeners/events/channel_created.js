@@ -6,27 +6,25 @@ import { createChannel } from "../../utility/slack_api";
 const channelCreatedCallback = async ({ client, event }) => {
   try {
     const channelName = event.channel.name;
-    const channelId = event.channel.id;
+    // const channelId = event.channel.id;
     const teamId = event.channel.context_team_id;
 
-    console.log("Creating channel " + channelName);
+    //only listen to admin teamId
+    const adminUser = await User.findById(teamId);
+    if (!adminUser.isAdmin) return;
 
-    //check if teamId isAdmin in User table
-    const user = await User.findById(teamId);
-    const isAdmin = user.isAdmin;
-    if (!isAdmin) return;
+    const users = await User.find({ isAdmin: false });
+    // const adminUser = await User.find({ isAdmin: true });
 
-    await User.find({ isAdmin: false }).then(async (users) => {
-      await createChannel(client, channelName, users).then((channels) => {
-        //record to Channel table
-        Channel.create({
-          admin: { teamId: teamId, channelId: channelId, userId: "" },
-          suppliers: channels,
-        });
-      });
-    });
+    await createChannel(client, channelName, users, adminUser).then(
+      (channels) => {
+        for (const channel of channels) {
+          Channel.create(channel);
+        }
+      }
+    );
   } catch (error) {
-    logger.error(error);
+    logger.error(`${error}`);
   }
 };
 

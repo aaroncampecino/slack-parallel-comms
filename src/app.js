@@ -1,11 +1,9 @@
 const { App, LogLevel } = require("@slack/bolt");
 import "dotenv/config";
+import { getInstallationStore } from "./installationStore";
 import { registerListeners } from "./listeners";
 import { logger } from "./logger";
-const orgAuth = require("./database/auth/store_user_org_install");
-const workspaceAuth = require("./database/auth/store_user_workspace_install");
 const db = require("./database/db");
-const user = require("./database/model/User");
 const customRoutes = require("./utility/custom_routes");
 const manifest = require("../manifest.json");
 
@@ -42,54 +40,18 @@ const app = new App({
     stateVerification: false,
     // directInstall: true,
   },
-  installationStore: {
-    storeInstallation: async (installation) => {
-      console.log("installation " + JSON.stringify(installation));
-      if (
-        installation.isEnterpriseInstall &&
-        installation.enterprise !== undefined
-      ) {
-        return await orgAuth.saveUserOrgInstall(installation);
-      }
-      if (installation.team !== undefined) {
-        return await workspaceAuth.saveUserWorkspaceInstall(installation);
-      }
-      throw new Error("Failed saving installation data to installationStore");
-    },
-    fetchInstallation: async (installQuery) => {
-      // console.log("installQuery " + installQuery);
-      // console.log(installQuery);
-      if (
-        installQuery.isEnterpriseInstall &&
-        installQuery.enterpriseId !== undefined
-      ) {
-        const data = await user.findUser(installQuery.enterpriseId);
-        return data._doc;
-      }
-      if (installQuery.teamId !== undefined) {
-        const data = await user.findUser(installQuery.teamId);
-        return data._doc;
-      }
-      throw new Error("Failed fetching installation");
-    },
-    deleteInstallation: async (installQuery) => {
-      if (
-        installQuery.isEnterpriseInstall &&
-        installQuery.enterpriseId !== undefined
-      ) {
-        return await user.deleteUser(installQuery.enterpriseId);
-      }
-      if (installQuery.teamId !== undefined) {
-        return await user.deleteUser(installQuery.teamId);
-      }
-      throw new Error("Failed to delete installation");
-    },
-  },
+  installationStore: getInstallationStore(),
 });
 
 registerListeners(app);
 
-// app.client.chat.postMessage({});
+// app.client.files.upload({
+//   token: 123,
+// });
+
+// app.client.chat.postMessage({
+//   attachments: {},
+// })
 (async () => {
   // Start the app
   await app.start(process.env.PORT);

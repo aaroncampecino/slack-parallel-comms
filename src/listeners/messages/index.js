@@ -1,7 +1,12 @@
 const { hiCallback } = require("./sample-message");
 
 const noBotMessages = async ({ message, next }) => {
-  if (message.bot_id === undefined) {
+  console.log("message");
+  console.log(message);
+  if (
+    (message.bot_id === undefined || message.text.startsWith("<!channel>")) &&
+    message.previous_message?.bot_id === undefined
+  ) {
     await next();
   }
 };

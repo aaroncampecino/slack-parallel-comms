@@ -1,6 +1,9 @@
 import { User } from "../database/model/User";
 import { UserMap } from "../database/model/UserMap";
 import { Conversation } from "../database/model/Conversation";
+import { deleteFile } from "./download";
+import { rotateTokenBeforeUsing } from "../authorize";
+let fs = require("fs");
 
 export const getUserInfo = async (client, userId, token) => {
   return await client.users.info({
@@ -23,50 +26,67 @@ export const postMessage = async (
   client,
   channels,
   messageText,
-  teamId,
+  teamId = null,
   message
 ) => {
   for (const item of channels) {
     const user = await User.findById(item.teamId);
     const isAdmin = user.isAdmin;
 
-    let filterTeamId = item.teamId;
-    if (isAdmin) filterTeamId = teamId;
+    // let filterTeamId = item.teamId;
+    // if (isAdmin) filterTeamId = teamId;
 
-    const userMap = await UserMap.findById(filterTeamId);
-    let username;
-    let iconUrl;
+    // const userMap = await UserMap.findById(filterTeamId);
+    // let username;
+    // let iconUrl;
 
-    if (isAdmin) {
-      username = userMap.suppliers.mapDisplayName;
-      iconUrl = userMap.suppliers.mapUserImageOriginal;
-    } else {
-      username = userMap.admin.mapDisplayName;
-      iconUrl = userMap.admin.mapUserImageOriginal;
-    }
+    // if (isAdmin) {
+    //   username = userMap.suppliers.mapDisplayName;
+    //   iconUrl = userMap.suppliers.mapUserImageOriginal;
+    // } else {
+    //   username = userMap.admin.mapDisplayName;
+    //   iconUrl = userMap.admin.mapUserImageOriginal;
+    // }
 
     const thread_ts = await getThreadTs(message, isAdmin, user);
 
-    console.log("thread_ts " + thread_ts);
+    const permalinks = await uploadFile(client, user.bot.token, item.channelId);
+
+    const images = permalinks.map((permalink) => `<${permalink}| >`).join("");
+
     const postedMessage = await client.chat.postMessage({
       channel: item.channelId,
       token: user.bot.token,
-      text: messageText,
-      username: username,
-      icon_url: iconUrl,
+      text: `${messageText} ${images}`,
+      // text: messageText,
+      // username: username,
+      // icon_url: iconUrl,
       thread_ts: thread_ts,
     });
-
-    console.log("postedMessage " + postedMessage);
-    console.log(postedMessage);
 
     await recordConversation(message, postedMessage, isAdmin);
   }
 };
 
+export const uploadFile = async (client, token, channelId) => {
+  const path = `${__dirname}/files`;
+  let files = fs.readdirSync(path);
+
+  const public_permalink = [];
+  for (const file of files) {
+    const response = await client.files.upload({
+      token: token,
+      file: fs.createReadStream(`${path}/${file}`),
+    });
+
+    public_permalink.push(response.file.permalink);
+  }
+  deleteFile();
+  return public_permalink;
+};
+
 const getThreadTs = async (message, isAdmin) => {
   const thread_ts = message.thread_ts;
-  console.log("getThreadTs " + thread_ts);
   if (thread_ts === undefined) return "";
 
   if (!isAdmin) {
@@ -156,42 +176,63 @@ const recordConversation = async (message, postedMessage, isAdmin) => {
   );
 };
 
-export const createChannel = async (client, channelName, users) => {
+export const createChannel = async (client, channelName, users, userAdmin) => {
   const newChannels = [];
 
   for (const item of users) {
-    const token = item.bot.token;
-    const teamId = item._id;
+    const clientInfo = await createChannels(client, channelName, item);
 
-    await client.conversations
-      .create({
-        name: channelName,
-        token: token,
-        team_id: teamId,
-      })
-      .then((newChannel) => {
-        getNonBotUsers(client, teamId, token).then((wsUsers) => {
-          const members = [];
-          wsUsers.forEach((item) => {
-            members.push(item.id);
-          });
+    const adminInfo = await createChannels(
+      client,
+      `${item.team.name}-${channelName}`.toLowerCase(),
+      userAdmin
+    );
 
-          client.conversations.invite({
-            channel: newChannel.channel.id,
-            users: members.join(","),
-            token: token,
-          });
-        });
+    const info = {
+      admin: adminInfo,
+      suppliers: clientInfo,
+    };
 
-        let clientInfo = {
-          channelId: newChannel.channel.id,
-          teamId: teamId,
-          channelName: channelName,
-        };
-
-        newChannels.push(clientInfo);
-      });
+    newChannels.push(info);
   }
 
   return newChannels;
+};
+
+const createChannels = async (client, channelName, item) => {
+  const token = item.bot.token;
+  const teamId = item._id;
+
+  let clientInfo = {};
+
+  const tokenRotate = await rotateTokenBeforeUsing(item);
+
+  await client.conversations
+    .create({
+      name: channelName,
+      token: tokenRotate.botToken,
+      team_id: teamId,
+    })
+    .then((newChannel) => {
+      getNonBotUsers(client, teamId, token).then((wsUsers) => {
+        const members = [];
+        wsUsers.forEach((item) => {
+          members.push(item.id);
+        });
+
+        client.conversations.invite({
+          channel: newChannel.channel.id,
+          users: members.join(","),
+          token: token,
+        });
+      });
+
+      clientInfo = {
+        channelId: newChannel.channel.id,
+        teamId: teamId,
+        channelName: channelName,
+      };
+    });
+
+  return clientInfo;
 };
