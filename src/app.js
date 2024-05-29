@@ -25,6 +25,20 @@ switch (process.env.LOG_LEVEL) {
     logLevel = LogLevel.INFO;
 }
 
+// const receiver = new SocketModeReceiver({
+//   appToken: process.env.SLACK_APP_TOKEN,
+//   // customRoutes: authRoutes,
+//   installerOptions: {
+//     port: process.env.PORT,
+//   },
+// });
+
+// const app = new App({
+//   receiver: receiver,
+//   token: process.env.SLACK_BOT_TOKEN,
+//   logLevel: logLevel,
+// });
+
 const app = new App({
   signingSecret: process.env.SLACK_BOT_SIGNING_SECRET,
   // token: process.env.SLACK_BOT_TOKEN,
